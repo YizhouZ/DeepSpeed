@@ -24,8 +24,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        repository: YizhouZ/DeepSpeed
     - name: Install prerequisite
       run: |
         pip install py-cpuinfo
@@ -44,5 +42,5 @@ jobs:
       run: |
         cd tests/torch_compile
         export ZE_AFFINITY_MASK=0,1
-        deepspeed compile_graph_break.py --deepspeed_config ds_config.json |& tee log.txt
+        deepspeed compile_graph_break.py --deepspeed_config ds_config.json 2>&1 | tee log.txt
         GITHUB_STEP_SUMMARY=$(cat log.txt |  grep "'graph_breaks'" | sed 's/,/ /g' | awk '{print $2}')
