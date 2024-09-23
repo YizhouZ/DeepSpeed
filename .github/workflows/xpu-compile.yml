@@ -5,6 +5,14 @@ on:
     branches:
       - 'yizhou/compile_workflow'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   compile-tests:
     runs-on: [self-hosted, torch_compile_2]
@@ -15,6 +23,7 @@ jobs:
       options: --privileged -it --rm --device /dev/dri:/dev/dri -v /dev/dri/by-path:/dev/dri/by-path --ipc=host --cap-add=ALL
 
     steps:
+    - uses: actions/checkout@v3
     - name: Install prerequisite
       run: |
         pwd
