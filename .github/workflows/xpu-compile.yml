@@ -3,24 +3,37 @@ name: xpu-compile
 on:
   pull_request:
     branches:
-      - yizhou/compile_workflow
+      - 'yizhou/compile_workflow'
 
 jobs:
-  build-linux:
+  unit-tests:
     runs-on: [self-hosted, torch_compile_2]
-    strategy:
-      max-parallel: 5
 
     steps:
-    - name: Add conda to system path
+    - uses: actions/checkout@v4
+    - name: Install prerequisite
       run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Test with pytest
+        apt-get update
+        apt-get install clinfo libaio-dev python3-pip -y
+        pip install torch==2.3.1 -f https://pytorch-extension.intel.com/release-whl/stable/xpu/us/torch/
+        pip install intel-extension-for-pytorch==2.3.110+xpu -f https://pytorch-extension.intel.com/release-whl/stable/xpu/us/intel-extension-for-pytorch/
+        pip install oneccl_bind_pt==2.3.100+xpu -f https://pytorch-extension.intel.com/release-whl/stable/xpu/us/oneccl-bind-pt/
+        pip install torchvision==0.18.1 -f https://pytorch-extension.intel.com/release-whl/stable/xpu/us/torchvision/
+        pip install py-cpuinfo numpy
+        pip install .[dev,autotuning]
+
+    - name: Check container state
       run: |
-        pwd
-        export PATH=~/miniconda3/bin:$PATH
-        source activate
-        conda acitvate llm0203
-        cd tmp
-        
+        ldd --version
+        ds_report
+        python3 -c "import torch; print('torch:', torch.__version__, torch)"
+        python3 -c "import torch; import intel_extension_for_pytorch; print('XPU available:', torch.xpu.is_available())"
+        python3 -c "from deepspeed.accelerator import get_accelerator; print('accelerator:', get_accelerator()._name)"
+        pip list
+
+    - name: Compile Status
+      run: |
+        cd tests/torch_compile
+        export ZE_AFFINITY_MASK=0,1
+        deepspeed compile_graph_break.py --deepspeed_config ds_config.json |& tee log.txt
+        GITHUB_STEP_SUMMARY=$(cat log.txt |  grep "'graph_breaks'" | sed 's/,/ /g' | awk '{print $2}')
