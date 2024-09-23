@@ -5,6 +5,8 @@ on:
   schedule:
     - cron: "0 0 * * *"
   pull_request:
+    branches:
+      - 'yizhou/compile_workflow'
     paths:
       - ".github/workflows/xpu-compile.yml"
       - "accelerator/xpu_accelerator.py"
