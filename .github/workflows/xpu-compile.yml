@@ -44,6 +44,7 @@ jobs:
         export FI_PROVIDER_PATH=$ONEAPI_ROOT/opt/mpi/libfabric/lib/prov
         export LD_LIBRARY_PATH=$ONEAPI_ROOT/opt/mpi/libfabric/lib:$LD_LIBRARY_PATH
         export LD_LIBRARY_PATH=$ONEAPI_ROOT/lib:$LD_LIBRARY_PATH
+        ulimit -n 1048575
         cd tests/torch_compile
         export ZE_AFFINITY_MASK=0,1
         deepspeed compile_graph_break.py --deepspeed_config ds_config.json 2>&1 | tee log.txt
