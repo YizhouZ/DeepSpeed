@@ -10,7 +10,6 @@ jobs:
     runs-on: [self-hosted, torch_compile_2]
 
     steps:
-    - uses: actions/checkout@v4
     - name: Install prerequisite
       run: |
         apt-get update
