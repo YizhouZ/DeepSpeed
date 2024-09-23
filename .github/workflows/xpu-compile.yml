@@ -17,6 +17,9 @@ jobs:
     steps:
     - name: Install prerequisite
       run: |
+        pwd
+        ls
+        pip install py-cpuinfo
         pip install .[dev,autotuning]
 
     - name: Check container state
