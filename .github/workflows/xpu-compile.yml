@@ -23,11 +23,11 @@ jobs:
       options: --privileged -it --rm --device /dev/dri:/dev/dri -v /dev/dri/by-path:/dev/dri/by-path --ipc=host --cap-add=ALL
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        repository: YizhouZ/DeepSpeed
     - name: Install prerequisite
       run: |
-        pwd
-        ls
         pip install py-cpuinfo
         pip install .[dev,autotuning]
 
