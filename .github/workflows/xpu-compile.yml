@@ -41,6 +41,9 @@ jobs:
     - name: Compile Status
       run: |
         export CCL_ROOT=${CONDA_PREFIX}
+        export ONEAPI_ROOT=${CONDA_PREFIX}
+        echo $CCL_ROOT
+        echo $ONEAPI_ROOT
         cd tests/torch_compile
         export ZE_AFFINITY_MASK=0,1
         deepspeed compile_graph_break.py --deepspeed_config ds_config.json 2>&1 | tee log.txt
