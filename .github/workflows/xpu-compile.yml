@@ -17,7 +17,7 @@ jobs:
   compile-tests:
     runs-on: [self-hosted, torch_compile_2]
     container:
-      image: intel/intel-extension-for-pytorch:2.3.110-xpu
+      image: intel/oneapi-basekit:2024.2.1-0-devel-ubuntu22.04
       ports:
         - 80
       options: --privileged -it --rm --device /dev/dri:/dev/dri -v /dev/dri/by-path:/dev/dri/by-path --ipc=host --cap-add=ALL
@@ -26,7 +26,13 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install prerequisite
       run: |
-        pip install py-cpuinfo
+        apt-get update
+        apt-get install clinfo libaio-dev python3-pip -y
+        pip install torch==2.3.1 -f https://pytorch-extension.intel.com/release-whl/stable/xpu/us/torch/
+        pip install intel-extension-for-pytorch==2.3.110+xpu -f https://pytorch-extension.intel.com/release-whl/stable/xpu/us/intel-extension-for-pytorch/
+        pip install oneccl_bind_pt==2.3.100+xpu -f https://pytorch-extension.intel.com/release-whl/stable/xpu/us/oneccl-bind-pt/
+        pip install torchvision==0.18.1 -f https://pytorch-extension.intel.com/release-whl/stable/xpu/us/torchvision/
+        pip install py-cpuinfo numpy
         pip install .[dev,autotuning]
 
     - name: Check container state
